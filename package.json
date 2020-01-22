@@ -12,7 +12,6 @@
     "@vue/cli-plugin-eslint": "4.1.1",
     "@vue/cli-service": "4.1.1",
     "emoji-mart-vue": "2.6.6",
-    "vanilla-caret-js": "1.0.1",
     "vue": "^2.6.11"
   },
   "devDependencies": {

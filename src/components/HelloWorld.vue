@@ -4,14 +4,16 @@
     <div class="freinds" v-if="isArobase">
       <input type="text" v-model="search">
       <ul>
-        <li v-for="fr in freindsList" @click="addToTextArea(fr)">{{fr.name}}</li>
+        <li v-for="(fr,i) in freindsList" :key="i" @click="addToTextArea(fr)">{{fr.name}}</li>
       </ul>
     </div>
-    <span v-for="f in commentUsers">
+    <span v-for="(f, i) in commentUsers" :key="i">
       <a href="#">{{f.name}}</a>,
     </span>
-    <p>insertedFreinds</p>
-    {{insertedFreinds}}
+    <p>{{text}}</p>
+
+    <p>notInsertedFreinds</p>
+    {{notInsertedFreinds}}
     <p>freindsList</p>
     <br>
     <br>
@@ -25,7 +27,7 @@
 //import { emojiIndex } from 'emoji-mart-vue'
 import data from "emoji-mart-vue/data/messenger";
 import { NimbleEmojiIndex } from "emoji-mart-vue";
-import { type } from "os";
+
 export default {
   data() {
     return {
@@ -47,25 +49,32 @@ export default {
   methods: {
     handle() {
       var input = this.$refs.txt;
-      let lastIndexOf = input.value.lastIndexOf(" ");
-      //console.log(input.selectionStart);
-      //console.log(lastIndexOf);
+      let lastIndexOf = this.text.lastIndexOf(" ");
+      // console.log("selectionStart" + input.selectionStart);
+
+      // console.log("length" + this.text.length);
       if (lastIndexOf === -1) {
-        lastIndexOf = 0;
+        if (this.text.lastIndexOf("\n") != -1) {
+          lastIndexOf = this.text.lastIndexOf("\n") + 1;
+        } else {
+          lastIndexOf = 0;
+        }
       } else {
         lastIndexOf += 1;
       }
+      console.log("newLine" + this.text.lastIndexOf("\n"));
+      console.log("current" + lastIndexOf);
       let word = this.text.substr(lastIndexOf, input.selectionStart);
       if (this.getEmojis(word) !== false) {
-        //console.log("word |" + word + "|");
+        console.log("word |" + word + "|");
         //console.log(this.getEmojis(word));
-        //console.log("input " + input.value);
+        console.log("input " + input.value);
         var ch = this.text.replace(word, this.getEmojis(word));
         this.text = ch;
       }
     },
     getEmojis(word) {
-      let res = this.emojis.find(e => e.word == word);
+      let res = this.emojis.find(e => e.word === word);
       if (res) {
         return res.native;
       } else {
@@ -101,19 +110,21 @@ export default {
   watch: {
     text(nv, old) {
       var input = this.$refs.txt;
-   
-      if (old.substr(input.selectionStart - 1, 1) == "@") {
+
+      if (old.substr(input.selectionStart - 1, 1) === "@") {
         this.isArobase = false;
       } else {
         let u = this.commentUsers.find(
-          user => input.value.indexOf("@" + user.name) == -1
+          user => input.value.indexOf("@" + user.name) === -1
         );
 
         if (u) {
-          this.commentUsers = this.commentUsers.filter(user => user.id != u.id);
+          this.commentUsers = this.commentUsers.filter(
+            user => user.id !== u.id
+          );
         }
 
-        if (input.value.substr(input.selectionStart - 1, 1) == "@") {
+        if (input.value.substr(input.selectionStart - 1, 1) === "@") {
           this.isArobase = true;
           // this.currentPos = input.selectionStart
         } else {
@@ -124,9 +135,9 @@ export default {
   },
   computed: {
     freindsList() {
-      if (this.search != "") {
-        return this.insertedFreinds.filter(
-          item => item.indexOf(this.search) != -1
+      if (this.search !== "") {
+        return this.notInsertedFreinds.filter(
+          item => item.indexOf(this.search) !== -1
         );
       } else {
         return this.freinds;
@@ -136,7 +147,7 @@ export default {
       let frs = this.commentUsers.map(fr => fr.id);
       return frs;
     },
-    insertedFreinds() {
+    notInsertedFreinds() {
       let frs = this.freinds.filter(
         fr => !this.commentUsersIds.includes(fr.id)
       );

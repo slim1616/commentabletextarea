@@ -48,27 +48,31 @@ export default {
   },
   methods: {
     handle() {
+      console.log("handle");
       var input = this.$refs.txt;
-      let lastIndexOf = this.text.lastIndexOf(" ");
-      // console.log("selectionStart" + input.selectionStart);
-
-      // console.log("length" + this.text.length);
-      if (lastIndexOf === -1) {
-        if (this.text.lastIndexOf("\n") != -1) {
-          lastIndexOf = this.text.lastIndexOf("\n") + 1;
-        } else {
-          lastIndexOf = 0;
-        }
+      let lastSpace = this.text.lastIndexOf(" ");
+      let lastEnter = this.text.lastIndexOf("\n");
+      console.log("selectionStart" + input.selectionStart);
+      console.log("lastEnter" + lastEnter);
+      console.log("lastSpace" + lastSpace);
+      let last = -1;
+      if (lastSpace > lastEnter) {
+        last = lastSpace;
       } else {
-        lastIndexOf += 1;
+        last = lastEnter;
       }
-      console.log("newLine" + this.text.lastIndexOf("\n"));
-      console.log("current" + lastIndexOf);
-      let word = this.text.substr(lastIndexOf, input.selectionStart);
+      // console.log("length" + this.text.length);
+      if (last === -1) {
+        last = 0;
+      } else {
+        last += 1;
+      }
+      console.log("last" + last);
+      let word = this.text.substr(last, input.selectionStart);
       if (this.getEmojis(word) !== false) {
         console.log("word |" + word + "|");
         //console.log(this.getEmojis(word));
-        console.log("input " + input.value);
+        //console.log("input " + input.value);
         var ch = this.text.replace(word, this.getEmojis(word));
         this.text = ch;
       }
